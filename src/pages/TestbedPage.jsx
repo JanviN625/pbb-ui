@@ -5,9 +5,9 @@ import PageSelector from '../components/reader/PageSelector';
 import ImageViewer from '../components/reader/ImageViewer';
 import ContentDisplay from '../components/reader/ContentDisplay';
 
-// This preserves your EXACT original App.jsx functionality in the new TestbedPage
+// This preserves your EXACT original App.jsx functionality
 function TestbedPage() {
-  // State management - exactly as in your original App.jsx
+  // State management
   const [books, setBooks] = useState([]);
   const [selectedBook, setSelectedBook] = useState(null);
   const [pages, setPages] = useState([]);
@@ -73,11 +73,9 @@ function TestbedPage() {
       console.log('Pages data received:', pagesData);
       setPages(pagesData);
 
-      // Extract pages array from response
       const pagesArray = Array.isArray(pagesData) ? pagesData : (pagesData?.page_maps || pagesData?.pages || pagesData?.data || []);
       console.log('Pages array extracted:', pagesArray);
 
-      // Auto-select first page if available
       if (pagesArray && pagesArray.length > 0) {
         const sortedPages = [...pagesArray].sort((a, b) => {
           const aNum = parseInt(a.page_number) || 0;
@@ -110,8 +108,7 @@ function TestbedPage() {
   };
 
   const handleBookSelect = (book) => {
-    console.log('App: Book selected:', book);
-    // Ensure the book has an id field for consistency
+    console.log('Book selected:', book);
     const bookWithId = {
       ...book,
       id: book.id || book._id || book.book_id
@@ -141,7 +138,7 @@ function TestbedPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Header - Exactly as your original */}
+      {/* Header */}
       <header className="bg-white/80 backdrop-blur-md shadow-lg border-b border-slate-200/60">
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
@@ -180,9 +177,9 @@ function TestbedPage() {
         </div>
       </header>
 
-      {/* Main Content - Exactly as your original */}
+      {/* Main Content */}
       <main className="px-6 py-8 space-y-8">
-        {/* Top Section - Book Slider */}
+        {/* Book Slider */}
         <section>
           <BookSlider
             books={books}
@@ -194,9 +191,8 @@ function TestbedPage() {
           />
         </section>
   
-        {/* Bottom Section - Three Columns */}
+        {/* Three Columns */}
         <section className="flex gap-4 min-h-[700px]">
-          {/* Column 1: Page Selector - 10% width */}
           <div className="w-[10%] min-w-[120px]">
             <PageSelector
               pages={pages}
@@ -208,7 +204,6 @@ function TestbedPage() {
             />
           </div>
 
-          {/* Column 2: Image Viewer - 45% width */}
           <div className="w-[45%]">
             <ImageViewer
               bookId={selectedBook?.id}
@@ -217,7 +212,6 @@ function TestbedPage() {
             />
           </div>
 
-          {/* Column 3: Content Display - 45% width */}
           <div className="w-[45%]">
             <ContentDisplay
               content={pageContent}
@@ -230,22 +224,18 @@ function TestbedPage() {
             />
           </div>
         </section>
-
       </main>
 
-      {/* Footer - Exactly as your original */}
+      {/* Footer */}
       <footer className="bg-black text-white py-12 mt-16">
         <div className="px-6 max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
-            {/* Vision Section */}
             <div>
               <h3 className="text-xl font-bold mb-4 text-yellow-400">Pure Bhakti Base Vision</h3>
               <p className="text-gray-300 leading-relaxed">
                 To preserve, organize, and make accessible the divine teachings of Yugācārya Śrīla Bhaktivedānta Nārāyaṇa Gosvāmī Mahārāja to inspire and uplift seekers on the path of pure bhakti.
               </p>
             </div>
-
-            {/* Mission Section */}
             <div>
               <h3 className="text-xl font-bold mb-4 text-yellow-400">Pure Bhakti Base Mission</h3>
               <p className="text-gray-300 leading-relaxed">
@@ -253,8 +243,6 @@ function TestbedPage() {
               </p>
             </div>
           </div>
-
-          {/* Copyright */}
           <div className="border-t border-gray-700 mt-8 pt-6 text-center">
             <p className="text-gray-400">
               © 2025 Gokul Bhajan & Vedic Studies. All rights reserved.
@@ -262,7 +250,6 @@ function TestbedPage() {
           </div>
         </div>
       </footer>
-
     </div>
   );
 }

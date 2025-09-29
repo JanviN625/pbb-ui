@@ -1,220 +1,133 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { BookOpen, Search, MessageCircle, Quote, BookMarked, ArrowRight, TestTube2 } from 'lucide-react'
-import { useBooks } from '../context/BookContext'
+import { useState } from 'react';
+import LoadingSpinner from '../shared/LoadingSpinner';
 
-const HomePage = () => {
-  const { books, loading, loadBooks } = useBooks()
-  const [featuredBooks, setFeaturedBooks] = useState([])
+const ImageViewer = ({ bookId, pageNumber, pageLabel }) => {
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
 
-  useEffect(() => {
-    if (!books || (Array.isArray(books) ? books.length === 0 : !books.books)) {
-      loadBooks()
-    } else {
-      // Handle both array and object formats
-      const booksArray = Array.isArray(books) ? books : (books?.books || [])
-      setFeaturedBooks(booksArray.slice(0, 3))
-    }
-  }, [books, loadBooks])
+  if (!bookId || !pageNumber) {
+    return (
+      <div className="w-full h-full bg-white rounded-lg shadow-md p-6 flex items-center justify-center">
+        <div className="text-center text-gray-500">
+          <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <p className="text-lg font-medium">Select a page to view image</p>
+          <p className="text-sm text-gray-400 mt-1">Choose a book and page from the left panel</p>
+        </div>
+      </div>
+    );
+  }
 
-  const features = [
-    {
-      title: 'Book Reader',
-      description: 'Read spiritual books with an intuitive page-by-page interface',
-      icon: BookOpen,
-      link: '/reader',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      hoverColor: 'hover:bg-blue-100'
-    },
-    {
-      title: 'Book Search',
-      description: 'Search across all books to find specific content and teachings',
-      icon: Search,
-      link: '/search/books',
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-      hoverColor: 'hover:bg-green-100'
-    },
-    {
-      title: 'Glossary',
-      description: 'Look up spiritual terms and concepts with detailed explanations',
-      icon: BookMarked,
-      link: '/search/glossary',
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-      hoverColor: 'hover:bg-purple-100'
-    },
-    {
-      title: 'Verse Lookup',
-      description: 'Find specific verses and references across all scriptures',
-      icon: Quote,
-      link: '/verses',
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-      hoverColor: 'hover:bg-orange-100'
-    },
-    {
-      title: 'AI Chat',
-      description: 'Have conversations about spiritual topics with book context',
-      icon: MessageCircle,
-      link: '/chat',
-      color: 'text-pink-600',
-      bgColor: 'bg-pink-50',
-      hoverColor: 'hover:bg-pink-100'
-    },
-    {
-      title: 'Original Reader (Testbed)',
-      description: 'Access the original full-featured book reading interface',
-      icon: TestTube2,
-      link: '/testbed',
-      color: 'text-indigo-600',
-      bgColor: 'bg-indigo-50',
-      hoverColor: 'hover:bg-indigo-100'
-    }
-  ]
+  const imagePath = `/pbb_book_pages/${bookId}/${pageNumber}.webp`;
+
+  const handleImageLoad = () => {
+    setImageLoading(false);
+    setImageError(false);
+  };
+
+  const handleImageError = () => {
+    setImageLoading(false);
+    setImageError(true);
+  };
+
+  const toggleFullscreen = () => {
+    setFullscreen(!fullscreen);
+  };
+
+  const closeFullscreen = () => {
+    setFullscreen(false);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Hero Section */}
-      <section className="py-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-24 h-24 flex items-center justify-center">
-              <img
-                src="/images/bhakti_base_logo.webp"
-                alt="Bhakti Base Logo"
-                className="w-full h-full object-contain"
-                onError={(e) => {
-                  e.target.style.display = 'none'
-                }}
-              />
-            </div>
-          </div>
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-800 bg-clip-text text-transparent mb-4">
-            Pure Bhakti Base
-          </h1>
-          <p className="text-xl text-slate-600 font-medium mb-8 max-w-3xl mx-auto">
-            Unlocking the Eternal Teachings of Yugācārya Śrīla Bhaktivedānta Nārāyaṇa Gosvāmī Mahārāja
-          </p>
-          
-          {/* Quick Access to Original Reader */}
-          <div className="mb-12">
-            <Link
-              to="/testbed"
-              className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg"
+    <>
+      <div className="w-full h-full bg-white rounded-lg shadow-md overflow-hidden">
+        {/* Header */}
+        <div className="bg-gray-50 px-3 py-2 border-b">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-gray-800">
+             Orginal Book - Page Label : {pageLabel || `Page ${pageNumber}`}
+            </h3>
+            <button
+              onClick={toggleFullscreen}
+              className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded transition-colors"
+              title="View fullscreen"
             >
-              <BookOpen className="mr-3" size={24} />
-              Start Reading Books
-              <ArrowRight className="ml-2" size={20} />
-            </Link>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+              </svg>
+            </button>
           </div>
         </div>
-      </section>
 
-      {/* Features Grid */}
-      <section className="py-12 px-6">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-slate-800 mb-12">
-            Explore Sacred Wisdom
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature) => (
-              <Link
-                key={feature.title}
-                to={feature.link}
-                className={`group p-6 rounded-2xl border border-slate-200 ${feature.bgColor} ${feature.hoverColor} transition-all hover:shadow-lg hover:scale-105`}
-              >
-                <div className="flex items-center mb-4">
-                  <div className={`w-12 h-12 ${feature.bgColor} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                    <feature.icon className={`${feature.color}`} size={24} />
-                  </div>
-                  <h3 className="text-xl font-semibold text-slate-800 ml-4">
-                    {feature.title}
-                  </h3>
-                </div>
-                <p className="text-slate-600 mb-4">
-                  {feature.description}
+        {/* Image Container */}
+        <div className="relative bg-gray-100 flex items-center justify-center">
+          {imageLoading && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <LoadingSpinner size="large" message="Loading image..." />
+            </div>
+          )}
+
+          {imageError && !imageLoading && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center text-gray-500">
+                <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <p className="text-lg font-medium mb-2">Image not found</p>
+                <p className="text-sm text-gray-400">
+                  {imagePath}
                 </p>
-                <div className="flex items-center text-sm font-medium text-slate-500 group-hover:text-slate-700">
-                  Explore <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+              </div>
+            </div>
+          )}
 
-      {/* Featured Books */}
-      {featuredBooks.length > 0 && (
-        <section className="py-12 px-6">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-slate-800 mb-12">
-              Featured Books
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {featuredBooks.map((book) => {
-                const bookTitle = book.original_book_title || book.english_book_title || book.title || book.name
-                const bookId = book.id || book._id || book.book_id
-                
-                return (
-                  <div key={bookId} className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-white/20">
-                    <h3 className="text-lg font-semibold text-slate-800 mb-2">
-                      {bookTitle}
-                    </h3>
-                    <p className="text-sm text-slate-600 mb-4">
-                      {book.author || 'Unknown Author'}
-                    </p>
-                    <p className="text-xs text-slate-500 mb-4">
-                      {book.description || 'No description available'}
-                    </p>
-                    <Link
-                      to="/testbed"
-                      className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800"
-                    >
-                      Start Reading <ArrowRight size={14} className="ml-1" />
-                    </Link>
-                  </div>
-                )
-              })}
+          <img
+            src={imagePath}
+            alt={`Page ${pageNumber} of Book ${bookId}`}
+            className={`w-full h-full object-contain transition-opacity duration-200 ${
+              imageLoading || imageError ? 'opacity-0' : 'opacity-100'
+            }`}
+            style={{ maxWidth: '98%', maxHeight: '98%' }}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+          />
+        </div>
+
+
+      </div>
+
+      {/* Fullscreen Modal */}
+      {fullscreen && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
+          <div className="relative max-w-full max-h-full p-4">
+            <button
+              onClick={closeFullscreen}
+              className="absolute top-4 right-4 z-10 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <img
+              src={imagePath}
+              alt={`Page ${pageNumber} of Book ${bookId} - Fullscreen`}
+              className="max-w-full max-h-full object-contain"
+              onClick={closeFullscreen}
+            />
+
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded">
+              <p className="text-sm">
+                {pageLabel || `Page ${pageNumber}`} - Book {bookId}
+              </p>
             </div>
           </div>
-        </section>
+        </div>
       )}
+    </>
+  );
+};
 
-      {/* Vision & Mission */}
-      <section className="py-16 px-6 bg-slate-900 text-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12">
-            {/* Vision Section */}
-            <div className="text-center md:text-left">
-              <h3 className="text-2xl font-bold mb-6 text-yellow-400">Pure Bhakti Base Vision</h3>
-              <p className="text-slate-300 leading-relaxed">
-                To preserve, organize, and make accessible the divine teachings of Yugācārya Śrīla Bhaktivedānta Nārāyaṇa Gosvāmī Mahārāja to inspire and uplift seekers on the path of pure bhakti.
-              </p>
-            </div>
-
-            {/* Mission Section */}
-            <div className="text-center md:text-left">
-              <h3 className="text-2xl font-bold mb-6 text-yellow-400">Pure Bhakti Base Mission</h3>
-              <p className="text-slate-300 leading-relaxed">
-                To serve as a spiritual companion to devotees by offering intelligent access to Śrīla Gurudev's books and insights, enabling personalized, immersive, and multilingual learning experiences rooted in Gaudiya Vaishnava tradition.
-              </p>
-            </div>
-          </div>
-
-          {/* Copyright */}
-          <div className="border-t border-slate-700 mt-12 pt-8 text-center">
-            <p className="text-slate-400">
-              © 2025 Gokul Bhajan & Vedic Studies. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </section>
-    </div>
-  )
-}
-
-export default HomePage
+export default ImageViewer;

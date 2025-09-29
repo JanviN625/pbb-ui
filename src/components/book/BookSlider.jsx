@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import LoadingSpinner from './LoadingSpinner';
-import ErrorMessage from './ErrorMessage';
+import LoadingSpinner from '../shared/LoadingSpinner';
+import ErrorMessage from '../shared/ErrorMessage';
 
 const BookSlider = ({ books, loading, error, onBookSelect, selectedBookId, onRetry }) => {
   const [activeTab, setActiveTab] = useState('A');

@@ -1,5 +1,5 @@
-import LoadingSpinner from './LoadingSpinner';
-import ErrorMessage from './ErrorMessage';
+import LoadingSpinner from '../shared/LoadingSpinner';
+import ErrorMessage from '../shared/ErrorMessage';
 
 const PageSelector = ({
   pages,
