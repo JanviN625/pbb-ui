@@ -1,21 +1,31 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BookOpen, Search, MessageCircle, Quote, BookMarked, ArrowRight, TestTube2 } from 'lucide-react'
-import { useBooks } from '../context/BookContext'
+import { apiService } from '../services/api'
 
 const HomePage = () => {
-  const { books, loading, loadBooks } = useBooks()
+  const [books, setBooks] = useState([])
+  const [loading, setLoading] = useState(true)
   const [featuredBooks, setFeaturedBooks] = useState([])
 
   useEffect(() => {
-    if (!books || (Array.isArray(books) ? books.length === 0 : !books.books)) {
-      loadBooks()
-    } else {
+    loadBooks()
+  }, [])
+
+  const loadBooks = async () => {
+    try {
+      setLoading(true)
+      const booksData = await apiService.getBooks()
       // Handle both array and object formats
-      const booksArray = Array.isArray(books) ? books : (books?.books || [])
+      const booksArray = Array.isArray(booksData) ? booksData : (booksData?.books || [])
+      setBooks(booksArray)
       setFeaturedBooks(booksArray.slice(0, 3))
+    } catch (error) {
+      console.error('Error loading books:', error)
+    } finally {
+      setLoading(false)
     }
-  }, [books, loadBooks])
+  }
 
   const features = [
     {
@@ -147,7 +157,7 @@ const HomePage = () => {
       </section>
 
       {/* Featured Books */}
-      {featuredBooks.length > 0 && (
+      {!loading && featuredBooks.length > 0 && (
         <section className="py-12 px-6">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl font-bold text-center text-slate-800 mb-12">
@@ -164,15 +174,9 @@ const HomePage = () => {
                     <h3 className="text-lg font-semibold text-slate-800 mb-2">
                       {bookTitle}
                     </h3>
-                    <p className="text-sm text-slate-600 mb-4">
-                      {book.author || 'Unknown Author'}
-                    </p>
-                    <p className="text-xs text-slate-500 mb-4">
-                      {book.description || 'No description available'}
-                    </p>
                     <Link
                       to="/testbed"
-                      className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800"
+                      className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 mt-4"
                     >
                       Start Reading <ArrowRight size={14} className="ml-1" />
                     </Link>
